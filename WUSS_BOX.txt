@@ -1,7 +1,7 @@
 local Settings = {
     rewrittenmain = {
         Enabled = true,
-        Key = "c",
+        Key = "q",
         DOT = true,
         AIRSHOT = true,
         NOTIF = true,
