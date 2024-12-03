@@ -1,0 +1,448 @@
+local args = {
+    [1] = "UpdateMousePos",
+    [2] = {
+        ["MousePos"] = Vector3.new(math.huge, math.huge, math.huge),
+        ["Camera"] = Vector3.new(math.huge, math.huge, math.huge)
+    }
+}
+
+Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/vKhonshu/intro2/main/ui2"))()
+local NotifyLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/vKhonshu/intro/main/ui"))()
+NotifyLib.prompt('Ez GGs', 'Modified & Created By: Rizkky', 5)
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local VirtualInputManager = game:service("VirtualInputManager")
+
+local Hellbound = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local Logo = Instance.new("ImageLabel")
+local TextButton = Instance.new("TextButton")
+local UICorner_2 = Instance.new("UICorner")
+
+-- Properties:
+
+Hellbound.Name = "Ez GGs Clicks"
+Hellbound.Parent = game.CoreGui
+Hellbound.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+Frame.Parent = Hellbound
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.133798108, 0, 0.20107238, 0)
+Frame.Size = UDim2.new(0, 150, 0, 50)
+Frame.Active = true
+Frame.Draggable = true
+
+local function TopContainer()
+    Frame.Position = UDim2.new(0.5, -Frame.AbsoluteSize.X / 2, 0, -Frame.AbsoluteSize.Y / 2)
+end
+
+TopContainer()
+Frame:GetPropertyChangedSignal("AbsoluteSize"):Connect(TopContainer)
+
+UICorner.Parent = Frame
+
+Logo.Name = "Logo"
+Logo.Parent = Frame
+Logo.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+Logo.BackgroundTransparency = 3.000
+Logo.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Logo.BorderSizePixel = 0
+Logo.Position = UDim2.new(0.326732665, 0, 0, 0)
+Logo.Size = UDim2.new(0, 70, 0, 70)
+Logo.Image = "rbxassetid://7129155278"
+Logo.ImageTransparency = 0.300
+
+TextButton.Parent = Frame
+TextButton.BackgroundColor3 = Color3.fromRGB(101, 55, 229)
+TextButton.BackgroundTransparency = 5.000
+TextButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextButton.BorderSizePixel = 0
+TextButton.Position = UDim2.new(0.0792079195, 0, 0.18571429, 0)
+TextButton.Size = UDim2.new(0, 120, 0, 30)
+TextButton.Font = Enum.Font.SourceSansSemibold
+TextButton.Text = "Ez GGs"
+TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextButton.TextScaled = true
+TextButton.TextSize = 18.000
+TextButton.TextWrapped = true
+
+local Resolver = Instance.new("TextButton")
+Resolver.Parent = Frame
+Resolver.BackgroundColor3 = Color3.fromRGB(101, 55, 229)
+Resolver.BackgroundTransparency = 5.000
+Resolver.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Resolver.BorderSizePixel = 0
+Resolver.Position = UDim2.new(0.0792079195, 0, -0.7, 0)
+Resolver.Size = UDim2.new(0, 120, 0, 30)
+Resolver.Font = Enum.Font.SourceSansSemibold
+Resolver.Text = "Resolver Off"
+Resolver.TextColor3 = Color3.fromRGB(255, 255, 255)
+Resolver.TextScaled = true
+Resolver.TextSize = 1.000
+Resolver.TextWrapped = true
+
+local ResolverState = false
+local TargetedPlayer = nil
+local heartbeatConnection = nil
+local oldVelocity = Vector3.new(0, 0, 0)
+
+local function setPartVelocity(part, predictedVelocity)
+    part.Velocity = predictedVelocity
+    part.AssemblyLinearVelocity = predictedVelocity
+end
+
+local function predictNextVelocity(oldVelocity, currentVelocity, deltaTime)
+    local acceleration = (currentVelocity - oldVelocity) / deltaTime
+    return currentVelocity + acceleration * deltaTime
+end
+
+local function onHeartbeat(deltaTime)
+    if ResolverState and TargetedPlayer and TargetedPlayer.Character then
+        local humanoidRootPart = TargetedPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if humanoidRootPart then
+            local humanoid = TargetedPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                local moveDirection = humanoid.MoveDirection
+                local currentVelocity = moveDirection * 22
+                local predictedVelocity = predictNextVelocity(oldVelocity, currentVelocity, deltaTime)
+                setPartVelocity(humanoidRootPart, predictedVelocity)
+                oldVelocity = currentVelocity
+            end
+        end
+    end
+end
+local function manageHeartbeatConnection()
+    if ResolverState and not heartbeatConnection then
+        heartbeatConnection = RunService.Heartbeat:Connect(onHeartbeat)
+    elseif not ResolverState and heartbeatConnection then
+        heartbeatConnection:Disconnect()
+        heartbeatConnection = nil
+    end
+end
+
+RunService.Heartbeat:Connect(manageHeartbeatConnection)
+
+Resolver.MouseButton1Click:Connect(function()
+    ResolverState = not ResolverState
+    if ResolverState then
+        Resolver.Text = "Resolver On"
+    else
+        Resolver.Text = "Resolver Off"
+        TargetedPlayer = nil
+    end
+end)
+            
+Settings = {
+    rewrittenmain = {
+        Enabled = true,
+        DOT = true,
+        AIRSHOT = true,
+        NOTIF = true,
+        AUTOPRED = true,
+        FOV = math.huge, -- if you dont know what is math.huge let me tell you it is infinite? -TheRealX_ORA	
+    }
+}
+
+local SelectedPart = "HumanoidRootPart"
+local Prediction = true
+local PredictionValue = 0.2
+local AirshotPredictionValue = 0.065
+
+local CC = game:GetService("Workspace").CurrentCamera
+local Plr
+local enabled = false
+local accomidationfactor = PredictionValue
+local mouse = game.Players.LocalPlayer:GetMouse()
+local data = game.Players:GetPlayers()
+
+local placemarker = Instance.new("Part", game.Workspace)
+placemarker.Material = Enum.Material.Brick
+placemarker.Reflectance = 0
+placemarker.Shape = Enum.PartType.Block
+
+local hue = 0
+
+-- Update function to change the part's color over time
+RunService.Heartbeat:Connect(function(deltaTime)
+    hue = (hue + deltaTime * 0.1) % 1
+    local color = Color3.fromRGB(128, 0, 123)
+    placemarker.Color = color
+end)
+
+function makemarker(Parent, Adornee, Color, Size, Size2)
+    local e = Instance.new("BillboardGui", Parent)
+    e.Name = "PP"
+    e.Adornee = Adornee
+    e.Size = UDim2.new(Size, Size2, Size, Size2)
+    e.AlwaysOnTop = Settings.rewrittenmain.DOT
+    local a = Instance.new("Frame", e)
+    if Settings.rewrittenmain.DOT == true then
+        a.Size = UDim2.new(2, 0, 2, 0)
+    else
+        a.Size = UDim2.new(0, 0, 0, 0)
+    end
+    if Settings.rewrittenmain.DOT == true then
+        a.Transparency = 0
+        a.BackgroundTransparency = 0
+    else
+        a.Transparency = 1
+        a.BackgroundTransparency = 1
+    end
+    a.BackgroundColor3 = Color
+    local hue = 0
+    RunService.Heartbeat:Connect(function(deltaTime)
+        hue = (hue + deltaTime * 0.1) % 1
+        local color = Color3.fromRGB(255, 255, 255)
+        a.BackgroundColor3 = color
+    end)
+    local g = Instance.new("UICorner", a)
+    if Settings.rewrittenmain.DOT == false then
+        g.CornerRadius = UDim.new(0, 0)
+    else
+        g.CornerRadius = UDim.new(1, 1)
+    end
+    return (e)
+end
+
+function noob(player)
+    local character
+    repeat wait() until player.Character
+    local handler = makemarker(guimain, player.Character:WaitForChild(SelectedPart), Color3.fromRGB(0, 0, 0), 0.3, 3)
+    handler.Name = player.Name
+    player.CharacterAdded:connect(function(Char) handler.Adornee = Char:WaitForChild(SelectedPart) end)
+
+    spawn(function()
+        while wait() do
+            if player.Character then
+            end
+        end
+    end)
+end
+
+for i = 1, #data do
+    if data[i] ~= game.Players.LocalPlayer then
+        noob(data[i])
+    end
+end
+
+game.Players.PlayerAdded:connect(function(Player)
+    noob(Player)
+end)
+
+spawn(function()
+    placemarker.Anchored = true
+    placemarker.CanCollide = false
+
+    if Settings.rewrittenmain.DOT == true then
+        placemarker.Size = Vector3.new(2, 4, 2)
+    else
+        placemarker.Size = Vector3.new(0, 0, 0)
+    end
+
+    placemarker.Transparency = 0
+
+    if Settings.rewrittenmain.DOT then
+        makemarker(placemarker, placemarker, Color3.fromRGB(0, 0, 0), 0.40, 0)
+    end
+end)
+
+TextButton.MouseButton1Click:Connect(
+    function()
+        if enabled == true then
+            enabled = false
+
+            TextButton.Text = "YxTarget Off"
+            if Settings.rewrittenmain.NOTIF == true then
+                Plr = getClosestPlayerToCursor()
+                game.StarterGui:SetCore("SendNotification", {
+                    Title = "Unlocked",
+                    Text = "Spared: " .. tostring(Plr.Character.Humanoid.DisplayName),
+                    Duration = 1.5
+                })
+            end
+        else
+            TextButton.Text = "YxTarget On"
+            Plr = getClosestPlayerToCursor()
+            enabled = true
+            if Settings.rewrittenmain.NOTIF == true then
+                game.StarterGui:SetCore("SendNotification", {
+                    Title = "Locked",
+                    Text = "Victim: " .. tostring(Plr.Character.Humanoid.DisplayName),
+                    Duration = 2.5
+                })
+            end
+        end
+    end
+)
+
+function getClosestPlayerToCursor()
+    local closestPlayer
+    local shortestDistance = Settings.rewrittenmain.FOV
+
+    -- Mendapatkan posisi tengah layar
+    local centerX = mouse.ViewSizeX / 2
+    local centerY = mouse.ViewSizeY / 2
+
+    for i, v in pairs(game.Players:GetPlayers()) do
+        if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health ~= 0 and v.Character:FindFirstChild("HumanoidRootPart") then
+            local pos = CC:WorldToViewportPoint(v.Character.PrimaryPart.Position)
+            local magnitude = (Vector2.new(pos.X, pos.Y) - Vector2.new(centerX, centerY)).magnitude
+            
+            -- Melakukan raycast untuk memeriksa apakah pemain terhalang oleh tembok
+            local origin = CC.CFrame.Position
+            local direction = (v.Character.HumanoidRootPart.Position - origin).unit * 1000
+            local raycastParams = RaycastParams.new()
+            raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+            raycastParams.FilterDescendantsInstances = {game.Players.LocalPlayer.Character}
+
+            local raycastResult = game.Workspace:Raycast(origin, direction, raycastParams)
+            local isObstructed = raycastResult and raycastResult.Instance and raycastResult.Instance:IsDescendantOf(v.Character) == false
+
+            if not isObstructed and magnitude < shortestDistance then
+                closestPlayer = v
+                shortestDistance = magnitude
+            end
+        end
+    end
+    return closestPlayer
+end
+
+-- Update fungsi Heartbeat untuk memeriksa airshot
+RunService.Heartbeat:Connect(function(deltaTime)
+    -- Update warna untuk placemarker
+    hue = (hue + deltaTime * 0.1) % 1
+    local color = Color3.fromRGB(128, 0, 123)
+    placemarker.Color = color
+
+    -- Cek airshot
+    if enabled and Plr.Character ~= nil and Plr.Character:FindFirstChild("HumanoidRootPart") then
+        placemarker.CFrame = CFrame.new(Plr.Character[SelectedPart].Position + (Plr.Character.HumanoidRootPart.Velocity * accomidationfactor))  -- Tambahkan pemanggilan fungsi checkAirshot
+    else
+        placemarker.CFrame = CFrame.new(0, 9999, 0)
+    end
+end)
+
+-- Fungsi untuk menghasilkan nilai acak dan menambahkannya ke PredictionValue
+local function SuffixPrediction()
+    -- Mengubah nilai acak menjadi skala 1 banding 97989
+    local randomSuffix = math.random(1, 2200) / 20300
+    return randomSuffix
+end
+
+-- Fungsi untuk memperbarui PredictionValue secara otomatis
+local function updatePredictionValue()
+    while true do
+        if Settings and Settings.rewrittenmain and Settings.rewrittenmain.AUTOPRED == true then
+            local statsService = game:GetService("Stats")
+            if statsService then
+                local pingValueString = statsService.Network.ServerStatsItem["Data Ping"]:GetValueString()
+                local split = string.split(pingValueString, '(')
+                local ping = tonumber(split[1])
+
+                -- Update PredictionValue dan tambahkan hasil acak ke belakangnya
+                local basePrediction = 0.1 + (ping / 1000)
+                PredictionValue = basePrediction + SuffixPrediction()
+            else
+                warn("Stats service not found.")
+            end
+        end
+        wait(0.001) -- Update setiap 0.1 detik atau sesuai kebutuhanmu
+    end
+end
+
+-- Mulai loop untuk update PredictionValue
+coroutine.wrap(updatePredictionValue)()
+
+game:GetService("RunService").Stepped:Connect(function()
+    if enabled and Plr and Plr.Character and Plr.Character:FindFirstChild("HumanoidRootPart") then
+        local selectedPart = Plr.Character[SelectedPart]
+        local targetPosition = selectedPart.Position
+
+        -- Cek status udara target
+        local humanoid = Plr.Character:FindFirstChildOfClass("Humanoid")
+        local isFalling = humanoid and humanoid:GetState() == Enum.HumanoidStateType.Freefall
+        local isJumping = humanoid and humanoid:GetState() == Enum.HumanoidStateType.Jumping
+        local isOnGround = humanoid and humanoid:GetState() == Enum.HumanoidStateType.Landed
+
+        -- Ambil tool pemain
+        local tool = game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
+        if tool then
+            if isFalling and not isJumping then
+                -- Delay sebelum mengaktifkan tool
+                wait(0.2)  -- Ganti 0.1 dengan waktu delay yang diinginkan (dalam detik)
+                tool:Activate()
+            else
+                -- Nonaktifkan tool jika target tidak dalam kondisi yang sesuai
+                if tool.Enabled then
+                    tool:Deactivate()  -- Pastikan ada metode untuk menonaktifkan tool jika ada
+                end
+            end
+        end
+
+        -- Update posisi placemarker dengan nilai prediksi
+        if isFalling and not isJumping then
+            SelectedPart = "LowerTorso" -- Ubah SelectedPart ke LowerTorso saat airshot aktif
+            placemarker.CFrame = CFrame.new(targetPosition + (selectedPart.Velocity * AirshotPredictionValue))
+        else
+            SelectedPart = "HumanoidRootPart" -- Kembali ke HumanoidRootPart jika tidak berada di udara
+            placemarker.CFrame = CFrame.new(targetPosition + (selectedPart.Velocity * PredictionValue))
+        end
+    else
+        placemarker.CFrame = CFrame.new(0, 9999, 0)
+    end
+end)
+
+-- Akhir dari perubahan metatable
+local mt = getrawmetatable(game)
+local old = mt.__namecall
+
+setreadonly(mt, false)
+mt.__namecall = newcclosure(function(...)
+    local args = {...}
+    if enabled and getnamecallmethod() == "FireServer" and Settings.rewrittenmain.Enabled and Plr.Character ~= nil then
+        local characterPosition = Plr.Character[SelectedPart].Position
+        local characterVelocity = Plr.Character[SelectedPart].Velocity
+        local predictionPosition
+
+        -- Penanganan berbagai jenis args[2]
+        if args[2] == "UpdateMousePos" or args[2] == "MOUSE" or args[2] == "MousePos" then
+            if Prediction == true then
+                if type(args[3]) == "table" then
+                    predictionPosition = {
+                        characterPosition + Vector3.new(
+                            characterVelocity.X * PredictionValue, 
+                            characterVelocity.Y * AirshotPredictionValue, 
+                            characterVelocity.Z * PredictionValue
+                        )
+                    }
+                    args[3] = predictionPosition
+                else
+                    predictionPosition = characterPosition + Vector3.new(
+                        characterVelocity.X * PredictionValue, 
+                        characterVelocity.Y * AirshotPredictionValue, 
+                        characterVelocity.Z * PredictionValue
+                    )
+                    args[3] = predictionPosition
+                end
+            else
+                if type(args[3]) == "table" then
+                    args[3] = {
+                        characterPosition
+                    }
+                else
+                    args[3] = characterPosition
+                end
+            end
+        end
+        
+        -- Pengembalian hasil
+        return old(unpack(args))
+    end
+    return old(...)
+end)
+
+-- Pastikan NotifyLib dan metode prompt didefinisikan dengan benar
+NotifyLib.prompt('YxGgs', 'Loaded Soo Tapn🤑', 5)
