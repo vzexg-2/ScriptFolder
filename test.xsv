@@ -1,0 +1,9 @@
+var{name_a = "sxc"}
+input[#"What is your name: "] !name
+
+Incase ?name is "sxc_qq1" {
+    ?output:{_message="Welcome!"}
+} exc { Incase ?name is "trump" {
+    ?output:{_message="AMERICA NEED OILLL"}
+} exc { } }
+
