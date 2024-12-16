@@ -1,0 +1,76 @@
+getgenv().scriptkey = "Yourkeyherr"
+getgenv().gptcc = {
+    ["Aimbot"] = {  
+        ["Enabled"] = true,
+        ["Notifications"] = false,
+        ["PINGBASED"] = true,
+        ["PredictionValue"] = 0.1,
+        ["Radius"] = 150,
+        ["AirPrediction"] = 0.03
+    },
+    ["AimbotCamlock"] = {
+        ["Smoothness"] = 0.6,
+        ["AirSmoothness"] = 0.6,
+        ["Campred"] = 0.2,
+        ["ShakeValue"] = 0,
+        ["AimPart"] = "UpperTorso"
+    },
+    ["FOVSettings"] = {
+        ["FOVVisible"] = false,
+        ["FOVSize"] = 150
+    },
+    ["Checks"] = {
+        ["FriendCheck"] = false,
+        ["UnlockOnKO"] = true,
+        ["AntiGroundShots"] = true
+    },
+    ["Visuals"] = {
+        ["Line"] = true,
+        ["Highlight"] = false,
+        ["Emoji"] = false,
+        ["EmojiType"] = "🥵"
+    },
+    ["BulletRedirection"] = { 
+        ["Enabled"] = false,
+        ["HitPart"] = "HumanoidRootPart",
+        ["AirPart"] = "LowerTorso",
+        ["Prediction"] = 0.16,
+        ["AirPrediction"] = 0.1,
+        ["FOV"] = {
+            ["Visible"] = false,
+            ["Size"] = 100
+        },
+        ["Checks"] = {
+            ["WallCheck"] = false,
+            ["FriendCheck"] = true,
+            ["KOCheck"] = false,
+            ["AntiGroundShots"] = true
+        },
+        ["Hitchance"] = {
+            ["Value"] = 100
+        }
+    },
+    ["Triggerbot"] = {
+        ["Enabled"] = false,
+        ["Delay"] = 0.1,
+        ["TapDelay"] = 0.01,
+        ["UsePrediction"] = true,
+        ["Prediction"] = 0.145,
+        ["Tolerance"] = 20,
+        ["Distance"] = 300,
+        ["FOVSize"] = 80,
+        ["FOVShow"] = false,
+        ["Whitelisted"] = {"[Double-Barrel SG]", "[DoubleBarrel]", "[Revolver]", "[TacticalShotgun]"},
+        ["UseWhitelist"] = true, 
+        ["AimParts"] = {"HumanoidRootPart", "Head"},
+        ["WallCheck"] = true,
+        ["KOCheck"] = true
+    },
+    ["Utility"] = {
+        ["Tool"] = false,
+        ["Button"] = true,
+        ["ButtonSize"] = 120,
+        ["Macro"] = true
+    }
+}
+loadstring(game:HttpGet("https://raw.githubusercontent.com/mobiletapper/hahahaha123/refs/heads/main/Protected_6466341779032946.txt", true))()
