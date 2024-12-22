@@ -47,8 +47,8 @@ Frame.Parent = MyAss
 Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Frame.BorderSizePixel = 0
-Frame.Position = UDim2.new(0.5, -75, 0.5, -25)
-Frame.Size = UDim2.new(0, 150, 0, 50)
+Frame.Position = UDim2.new(0.5, -100, 0.5, -40)
+Frame.Size = UDim2.new(0, 200, 0, 80)
 Frame.Active = true
 Frame.Draggable = true
 
@@ -65,12 +65,12 @@ TextButton.Parent = Frame
 TextButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 TextButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 TextButton.BorderSizePixel = 0
-TextButton.Position = UDim2.new(0.1, 0, 0.2, 0)
-TextButton.Size = UDim2.new(0.8, 0, 0.6, 0)
+TextButton.Position = UDim2.new(0.05, 0, 0.2, 0)
+TextButton.Size = UDim2.new(0.9, 0, 0.6, 0)
 TextButton.Font = Enum.Font.GothamSemibold
 TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-TextButton.TextSize = 14
-TextButton.Text = "Lock {off}"
+TextButton.TextSize = 16
+TextButton.Text = "lock {off}"
 
 UICorner_2.Parent = TextButton
 
@@ -85,11 +85,10 @@ TextButton.MouseButton1Click:Connect(function()
                 Text = "Unlocked"
             })
         end
-        TextButton.Text = "Lock {off}"
+        TextButton.Text = "lock {off}"
     else
         Plr = FindClosestPlayer()
         TargetPlayer = tostring(Plr)
-
         Enabled = true
         if Notifications then
             Plr = FindClosestPlayer()
@@ -99,7 +98,7 @@ TextButton.MouseButton1Click:Connect(function()
                 Text = "Locked To: " .. tostring(TargetPlayer)
             })
         end
-        TextButton.Text = "Lock {on}"
+        TextButton.Text = "lock {on}"
     end
 end)
 
