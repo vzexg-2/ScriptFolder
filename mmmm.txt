@@ -1,0 +1,265 @@
+
+local Lnr = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local TextButton = Instance.new("TextButton")
+local UICorner_2 = Instance.new("UICorner")
+
+Lnr.Name = "Lnr"
+Lnr.Parent = game.CoreGui
+Lnr.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+Frame.Parent = Lnr
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.5, -125, 0.5, -40)
+Frame.Size = UDim2.new(0, 250, 0, 80)
+Frame.Active = true
+Frame.Draggable = true
+
+local function TopContainer()
+    Frame.Position = UDim2.new(0.5, -Frame.AbsoluteSize.X / 2, 0.5, -Frame.AbsoluteSize.Y / 2)
+end
+
+TopContainer()
+Frame:GetPropertyChangedSignal("AbsoluteSize"):Connect(TopContainer)
+
+UICorner.Parent = Frame
+UICorner.CornerRadius = UDim.new(0, 10) --rounded corners
+
+TextButton.Parent = Frame
+TextButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TextButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextButton.BorderSizePixel = 0
+TextButton.Position = UDim2.new(0.1, 0, 0.2, 0)
+TextButton.Size = UDim2.new(0.8, 0, 0.6, 0)
+TextButton.Font = Enum.Font.GothamBold
+TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextButton.TextSize = 20
+TextButton.Text = "{off}"
+
+UICorner_2.Parent = TextButton
+UICorner_2.CornerRadius = UDim.new(0, 8
+
+local function Notify(message)
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0.5, 0, 0.1, 0)
+    frame.Position = UDim2.new(0.5, 0, -0.1, 0)
+    frame.BackgroundColor3 = Color3.new(0, 0, 0)
+    frame.BorderSizePixel = 0 
+    frame.AnchorPoint = Vector2.new(0.5, 0.5)
+    frame.Parent = screenGui
+    
+    local uicorner = Instance.new("UICorner")
+    uicorner.CornerRadius = UDim.new(0.5, 0)
+    uicorner.Parent = frame
+    
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.Position = UDim2.new(0, 0, 0, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = message
+    textLabel.TextColor3 = Color3.new(1, 1, 1)
+    textLabel.TextScaled = true
+    textLabel.Font = Enum.Font.SciFi
+    textLabel.TextSize = 14
+    textLabel.Parent = frame
+    
+    local textBlur = Instance.new("TextLabel")
+    textBlur.Size = UDim2.new(1, 0, 1, 0)
+    textBlur.Position = UDim2.new(0, 0, 0, 0)
+    textBlur.BackgroundTransparency = 1
+    textBlur.Text = message
+    textBlur.TextColor3 = Color3.new(1, 1, 1)
+    textBlur.TextScaled = true
+    textBlur.Font = Enum.Font.SciFi
+    textBlur.TextSize = 14
+    textBlur.TextTransparency = 0.5
+    textBlur.Parent = frame
+    textBlur.ZIndex = textLabel.ZIndex - 1
+    textBlur.TextStrokeTransparency = 0.75
+    
+    frame:TweenPosition(UDim2.new(0.5, 0, 0.1, 0), "Out", "Quad", 1, true)
+    wait(5)
+    
+    for i = 0, 1, 0.1 do
+        frame.BackgroundTransparency = i
+        textLabel.TextTransparency = i
+        textBlur.TextTransparency = 0.5 + i / 2
+        wait(0.1)
+    end
+    
+    screenGui:Destroy()
+end
+
+-- Aiming Configuration
+getgenv().OldAimPart = "UpperTorso"
+getgenv().AimPart = "UpperTorso" 
+getgenv().AimRadius = 7.22
+getgenv().ThirdPerson = true 
+getgenv().FirstPerson = true
+getgenv().TeamCheck = false 
+getgenv().PredictMovement = true
+getgenv().PredictionVelocity = 25
+getgenv().CheckIfJumped = true
+getgenv().Smoothness = true
+getgenv().SmoothnessAmount = 0.0421
+
+local Players, Uis, RService, SGui = game:GetService"Players", game:GetService"UserInputService", game:GetService"RunService", game:GetService"StarterGui"
+local Client, Mouse, Camera, CF, RNew, Vec3, Vec2 = Players.LocalPlayer, Players.LocalPlayer:GetMouse(), workspace.CurrentCamera, CFrame.new, Ray.new, Vector3.new, Vector2.new
+local Aimlock, AimActive = true, false
+local AimlockTarget
+local OldPre
+
+getgenv().WorldToViewportPoint = function(P)
+    return Camera:WorldToViewportPoint(P)
+end
+
+getgenv().WorldToScreenPoint = function(P)
+    return Camera.WorldToScreenPoint(Camera, P)
+end
+
+getgenv().GetObscuringObjects = function(T)
+    if T and T:FindFirstChild(getgenv().AimPart) and Client and Client.Character:FindFirstChild("Head") then 
+        local RayPos = workspace:FindPartOnRay(RNew(
+            T[getgenv().AimPart].Position, Client.Character.Head.Position)
+        )
+        if RayPos then return RayPos:IsDescendantOf(T) end
+    end
+end
+
+getgenv().GetNearestTarget = function()
+    local players = {}
+    local PLAYER_HOLD  = {}
+    local DISTANCES = {}
+    for i, v in pairs(Players:GetPlayers()) do
+        if v ~= Client then
+            table.insert(players, v)
+        end
+    end
+    for i, v in pairs(players) do
+        if v.Character ~= nil then
+            local AIM = v.Character:FindFirstChild("Head")
+            if getgenv().TeamCheck == true and v.Team ~= Client.Team then
+                local DISTANCE = (v.Character:FindFirstChild("Head").Position - game.Workspace.CurrentCamera.CFrame.p).magnitude
+                local RAY = Ray.new(game.Workspace.CurrentCamera.CFrame.p, (Mouse.Hit.p - game.Workspace.CurrentCamera.CFrame.p).unit * DISTANCE)
+                local HIT,POS = game.Workspace:FindPartOnRay(RAY, game.Workspace)
+                local DIFF = math.floor((POS - AIM.Position).magnitude)
+                PLAYER_HOLD[v.Name .. i] = {}
+                PLAYER_HOLD[v.Name .. i].dist= DISTANCE
+                PLAYER_HOLD[v.Name .. i].plr = v
+                PLAYER_HOLD[v.Name .. i].diff = DIFF
+                table.insert(DISTANCES, DIFF)
+            elseif getgenv().TeamCheck == false and v.Team == Client.Team then 
+                local DISTANCE = (v.Character:FindFirstChild("Head").Position - game.Workspace.CurrentCamera.CFrame.p).magnitude
+                local RAY = Ray.new(game.Workspace.CurrentCamera.CFrame.p, (Mouse.Hit.p - game.Workspace.CurrentCamera.CFrame.p).unit * DISTANCE)
+                local HIT,POS = game.Workspace:FindPartOnRay(RAY, game.Workspace)
+                local DIFF = math.floor((POS - AIM.Position).magnitude)
+                PLAYER_HOLD[v.Name .. i] = {}
+                PLAYER_HOLD[v.Name .. i].dist= DISTANCE
+                PLAYER_HOLD[v.Name .. i].plr = v
+                PLAYER_HOLD[v.Name .. i].diff = DIFF
+                table.insert(DISTANCES, DIFF)
+            end
+        end
+    end
+    
+    if unpack(DISTANCES) == nil then
+        return nil
+    end
+    
+    local L_DISTANCE = math.floor(math.min(unpack(DISTANCES)))
+    if L_DISTANCE > getgenv().AimRadius then
+        return nil
+    end
+    
+    for i, v in pairs(PLAYER_HOLD) do
+        if v.diff == L_DISTANCE then
+            return v.plr
+        end
+    end
+    return nil
+end
+
+-- Button Click Handler
+TextButton.MouseButton1Click:Connect(function()
+    AimActive = not AimActive
+    if AimActive then
+        TextButton.Text = "{on}"
+        TextButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40) -- Darker when active
+        pcall(function()
+            if AimlockTarget == nil then
+                local Target = GetNearestTarget()
+                if Target ~= nil then 
+                    AimlockTarget = Target
+                    Notify("Target Acquired: " .. AimlockTarget.Name)
+                end
+            end
+        end)
+    else
+        TextButton.Text = "{off}"
+        TextButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25) -- Original color when inactive
+        if AimlockTarget ~= nil then 
+            AimlockTarget = nil
+            Notify("Target Released")
+        end
+    end
+end)
+
+RService.RenderStepped:Connect(function()
+    if getgenv().ThirdPerson == true and getgenv().FirstPerson == true then 
+        if (Camera.Focus.p - Camera.CoordinateFrame.p).Magnitude > 1 or (Camera.Focus.p - Camera.CoordinateFrame.p).Magnitude <= 1 then 
+            CanNotify = true 
+        else 
+            CanNotify = false 
+        end
+    elseif getgenv().ThirdPerson == true and getgenv().FirstPerson == false then 
+        if (Camera.Focus.p - Camera.CoordinateFrame.p).Magnitude > 1 then 
+            CanNotify = true 
+        else 
+            CanNotify = false 
+        end
+    elseif getgenv().ThirdPerson == false and getgenv().FirstPerson == true then 
+        if (Camera.Focus.p - Camera.CoordinateFrame.p).Magnitude <= 1 then 
+            CanNotify = true 
+        else 
+            CanNotify = false 
+        end
+    end
+    
+    if Aimlock == true and AimActive == true then 
+        if AimlockTarget and AimlockTarget.Character and AimlockTarget.Character:FindFirstChild(getgenv().AimPart) then 
+            if getgenv().FirstPerson == true then
+                if CanNotify == true then
+                    if getgenv().PredictMovement == true then
+                        if getgenv().Smoothness == true then
+                            local Main = CF(Camera.CFrame.p, AimlockTarget.Character[getgenv().AimPart].Position + AimlockTarget.Character[getgenv().AimPart].Velocity/PredictionVelocity)
+                            Camera.CFrame = Camera.CFrame:Lerp(Main, getgenv().SmoothnessAmount, Enum.EasingStyle.Elastic, Enum.EasingDirection.InOut)
+                        else
+                            Camera.CFrame = CF(Camera.CFrame.p, AimlockTarget.Character[getgenv().AimPart].Position + AimlockTarget.Character[getgenv().AimPart].Velocity/PredictionVelocity)
+                        end
+                    elseif getgenv().PredictMovement == false then 
+                        if getgenv().Smoothness == true then
+                            local Main = CF(Camera.CFrame.p, AimlockTarget.Character[getgenv().AimPart].Position)
+                            Camera.CFrame = Camera.CFrame:Lerp(Main, getgenv().SmoothnessAmount, Enum.EasingStyle.Elastic, Enum.EasingDirection.InOut)
+                        else
+                            Camera.CFrame = CF(Camera.CFrame.p, AimlockTarget.Character[getgenv().AimPart].Position)
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    if CheckIfJumped == true and AimlockTarget and AimlockTarget.Character then
+        if AimlockTarget.Character.Humanoid.FloorMaterial == Enum.Material.Air then
+            getgenv().AimPart = "UpperTorso"
+        else
+            getgenv().AimPart = getgenv().OldAimPart
+        end
+    end
+end)
