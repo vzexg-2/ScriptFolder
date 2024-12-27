@@ -40,7 +40,7 @@ TextButton.TextSize = 20
 TextButton.Text = "{off}"
 
 UICorner_2.Parent = TextButton
-UICorner_2.CornerRadius = UDim.new(0, 8
+UICorner_2.CornerRadius = UDim.new(0, 8)
 
 local function Notify(message)
     local screenGui = Instance.new("ScreenGui")
