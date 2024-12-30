@@ -1,12 +1,11 @@
-local CC = game:GetService"Workspace".CurrentCamera
+local CC = game:GetService("Workspace").CurrentCamera
 local Plr
 local enabled = false
 local accomidationfactor = 0.1306942
-local mouse = game.Players.LocalPlayer:GetMouse()
 local placemarker = Instance.new("Part", game.Workspace)
 
 function SendNotification(e, a, dur)
-    game.StarterGui:SetCore("SendNotification",  {Title = "yuk.fun" ; Text = a; Icon = "http://www.roblox.com/asset/?id=8850953349"; Duration = dur;})
+    game.StarterGui:SetCore("SendNotification", { Title = "yuk.fun"; Text = a; Icon = "http://www.roblox.com/asset/?id=8850953349"; Duration = dur; })
 end
 
 function makemarker(Parent, Adornee, Color, Size, Size2)
@@ -21,68 +20,18 @@ function makemarker(Parent, Adornee, Color, Size, Size2)
     a.BackgroundColor3 = Color
     local g = Instance.new("UICorner", a)
     g.CornerRadius = UDim.new(50, 50)
-    return(e)
+    return e
 end
 
-    
-local data = game.Players:GetPlayers()
-function noob(player)
-    repeat wait() until player.Character
-    local handler = makemarker(guimain, player.Character:WaitForChild("HumanoidRootPart"), Color3.fromRGB(107, 184, 255), 0.3, 3)
-    handler.Name = player.Name
-    player.CharacterAdded:connect(function(Char) handler.Adornee = Char:WaitForChild("HumanoidRootPart") end)
-
-
-    spawn(function()
-        while wait() do
-            if player.Character then
-                TextLabel.Text = player.Name..tostring(player:WaitForChild("leaderstats").Wanted.Value).." | "..tostring(math.floor(player.Character:WaitForChild("Humanoid").Health))
-            end
-        end
-    end)
-end
-
-for i = 1, #data do
-    if data[i] ~= game.Players.LocalPlayer then
-        noob(data[i])
-    end
-end
-
-game.Players.PlayerAdded:connect(function(Player)
-    noob(Player)
-end)
-
-spawn(function()
-    placemarker.Anchored = true
-    placemarker.CanCollide = false
-    placemarker.Size = Vector3.new(15, 15, 15)
-    placemarker.Transparency = 0.100
-    makemarker(placemarker, placemarker, Color3.fromRGB(82, 112, 234), 0.40, 0)
-end)    
-
-mouse.KeyDown:Connect(function(k)
-    if k ~= "q" then return end
-    if enabled then
-        enabled = false
-        SendNotification('HuntersLock', "Unlocked", 3)
-        guimain[Plr.Name].Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    else
-        enabled = true 
-        Plr = getClosestPlayerToCursor()
-        SendNotification('HuntersLock', "Locked onto "..Plr.Name, 3)
-        guimain[Plr.Name].Frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    end    
-end)
-
-function getClosestPlayerToCursor()
+local function getClosestPlayerToCursor()
     local closestPlayer
     local shortestDistance = math.huge
 
-    for i, v in pairs(game.Players:GetPlayers()) do
+    for _, v in pairs(game.Players:GetPlayers()) do
         if v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health ~= 0 and v.Character:FindFirstChild("HumanoidRootPart") then
             local pos = CC:WorldToViewportPoint(v.Character.PrimaryPart.Position)
-            local magnitude = (Vector2.new(pos.X, pos.Y) - Vector2.new(mouse.X, mouse.Y)).magnitude
-                if magnitude < shortestDistance then
+            local magnitude = (Vector2.new(pos.X, pos.Y) - Vector2.new(game.Players.LocalPlayer:GetMouse().X, game.Players.LocalPlayer:GetMouse().Y)).magnitude
+            if magnitude < shortestDistance then
                 closestPlayer = v
                 shortestDistance = magnitude
             end
@@ -91,9 +40,63 @@ function getClosestPlayerToCursor()
     return closestPlayer
 end
 
-game:GetService"RunService".Stepped:connect(function()
-    if enabled and Plr.Character and Plr.Character:FindFirstChild("HumanoidRootPart") then
-        placemarker.CFrame = CFrame.new(Plr.Character.HumanoidRootPart.Position+(Plr.Character.HumanoidRootPart.Velocity*accomidationfactor))
+local MyAss = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local TextButton = Instance.new("TextButton")
+local UICorner_2 = Instance.new("UICorner")
+
+MyAss.Name = "MyAss"
+MyAss.Parent = game.CoreGui
+
+Frame.Parent = MyAss
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Frame.Position = UDim2.new(0.5, -100, 0.5, -40)
+Frame.Size = UDim2.new(0, 200, 0, 80)
+Frame.Active = true
+Frame.Draggable = true
+
+UICorner.Parent = Frame
+
+TextButton.Parent = Frame
+TextButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TextButton.Position = UDim2.new(0.05, 0, 0.2, 0)
+TextButton.Size = UDim2.new(0.9, 0, 0.6, 0)
+TextButton.Font = Enum.Font.GothamSemibold
+TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextButton.TextSize = 16
+TextButton.Text = "lock {off}"
+
+UICorner_2.Parent = TextButton
+
+TextButton.MouseButton1Click:Connect(function()
+    if enabled then
+        enabled = false
+        SendNotification('HuntersLock', "Unlocked", 3)
+        TextButton.Text = "lock {off}"
+    else
+        enabled = true
+        Plr = getClosestPlayerToCursor()
+        if Plr then
+            SendNotification('HuntersLock', "Locked onto " .. Plr.Name, 3)
+            TextButton.Text = "lock {on}"
+        else
+            SendNotification('HuntersLock', "No player found", 3)
+        end
+    end
+end)
+
+spawn(function()
+    placemarker.Anchored = true
+    placemarker.CanCollide = false
+    placemarker.Size = Vector3.new(15, 15, 15)
+    placemarker.Transparency = 0.1
+    makemarker(placemarker, placemarker, Color3.fromRGB(82, 112, 234), 0.40, 0)
+end)
+
+game:GetService("RunService").Stepped:Connect(function()
+    if enabled and Plr and Plr.Character and Plr.Character:FindFirstChild("HumanoidRootPart") then
+        placemarker.CFrame = CFrame.new(Plr.Character.HumanoidRootPart.Position + (Plr.Character.HumanoidRootPart.Velocity * accomidationfactor))
     else
         placemarker.CFrame = CFrame.new(0, 9999, 0)
     end
@@ -103,9 +106,9 @@ local mt = getrawmetatable(game)
 local old = mt.__namecall
 setreadonly(mt, false)
 mt.__namecall = newcclosure(function(...)
-local args = {...}
+    local args = { ... }
     if enabled and getnamecallmethod() == "FireServer" and args[2] == "UpdateMousePos" then
-        args[3] = Plr.Character.HumanoidRootPart.Position+(Plr.Character.HumanoidRootPart.Velocity*accomidationfactor)
+        args[3] = Plr.Character.HumanoidRootPart.Position + (Plr.Character.HumanoidRootPart.Velocity * accomidationfactor)
         return old(unpack(args))
     end
     return old(...)
