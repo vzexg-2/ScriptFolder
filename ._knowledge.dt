@@ -1,0 +1,185 @@
+import json
+import random
+import time
+import wikipedia
+from datetime import datetime
+
+class KnowledgeBaseTrainer:
+    def __init__(self, knowledge_base_path='knowledge_base.json'):
+        self.knowledge_base_path = knowledge_base_path
+        self.load_knowledge_base()
+        self.topics = [
+            'science', 'technology', 'history', 'geography', 
+            'arts', 'literature', 'philosophy', 'psychology',
+            'health', 'environment', 'space', 'biology',
+            'chemistry', 'physics', 'mathematics', 'movie',
+            'network', 'android', 'iphone', 'devices',
+            'universe', 'mythology', 'creature', 'immortal',
+            'color', 'communication', 'devices', 'computer',
+            'laptop', 'radiation', 'fiction', 'nuclear',
+            'bomb', 'terrorist', 'alien', 'planet',
+            'war', 'time travel', 'covid', 'virus',
+            'hacker', 'ddos', 'ransomware', 'malware', 'ransomware',
+            'tornado', 'hurricane', 'earthquake', 'flood',
+            'cybersecurity', 'security', 'authentication', 'Google'
+            'Chrome', 'browser', 'scam', 'phising', 'privacy',
+            'Fast food', 'oil', 'cars', 'car', 'transportation',
+            'murder', 'gore', 'blood', 'cells',
+            'phobia', 'zodiac', 'lies', 'medicine',
+            'sex', 'condom', 'pedophile', 'child',
+            'language', 'country', 'economy', 'multiverse',
+            'knowledge', 'dictionary', 'grammar', 'jobs',
+            'social media', 'space ship', 'Galaxy',
+            'Road', 'construction', 'AI', 'Robot',
+            'dead', 'religion', 'Jesus', 'God',
+            'porn', 'casino', 'trading', 'homework',
+            'teacher', 'school', 'drug', 'killing',
+            'necrophilia', 'sin', 'fighting', 'principal',
+            'programming', 'coding', 'debugging', 'IT',
+            'bruteforce', 'stalking', 'nudes', 'baby',
+            'organs', 'bot', 'discord', 'youtube',
+            'instagram', 'facebook', 'twitter', 'tiktok',
+            'snapchat', 'WhatsApp', 'iMessage', 'train',
+            'bus', 'plane', 'rocket', 'firework',
+            'Swear', 'gym', 'sport', 'superpowers'
+            ]
+        
+    def load_knowledge_base(self):
+        try:
+            with open(self.knowledge_base_path, 'r') as file:
+                self.knowledge_base = json.load(file)
+        except FileNotFoundError:
+            self.knowledge_base = {}
+            
+    def save_knowledge_base(self):
+        with open(self.knowledge_base_path, 'w') as file:
+            json.dump(self.knowledge_base, file, indent=2)
+            
+    def safe_wikipedia_search(self, topic):
+        try:
+            search_results = wikipedia.search(topic)
+            if not search_results:
+                return None
+                
+            for result in search_results[:4]:
+                try:
+                    page = wikipedia.page(result, auto_suggest=False)
+                    return page
+                except wikipedia.DisambiguationError as e:
+                    # If disambiguation page.
+                    if e.options:
+                        try:
+                            return wikipedia.page(e.options[0], auto_suggest=False)
+                        except:
+                            continue
+                except wikipedia.PageError:
+                    continue
+                except Exception as e:
+                    print(f"Error processing {result}: {str(e)}")
+                    continue
+            
+            return None
+        except Exception as e:
+            print(f"Error in safe_wikipedia_search: {str(e)}")
+            return None
+
+    def get_random_wikipedia_content(self):
+        try:
+            random_topic = random.choice(self.topics)
+            page = self.safe_wikipedia_search(random_topic)
+            
+            if not page:
+                return None
+                
+            questions = [
+                f"what is {page.title.lower()}",
+                f"can you explain {page.title.lower()}",
+                f"tell me about {page.title.lower()}",
+                f"what do you know about {page.title.lower()}",
+                f"how does {page.title.lower()} work",
+                f"why is {page.title.lower()} exist",
+                f"what are the key concepts of {page.title.lower()}",
+                f"how would you describe {page.title.lower()}",
+                f"what's the significance of {page.title.lower()}",
+                f"could you elaborate on {page.title.lower()}"
+            ]
+            
+            summary_sentences = page.summary.split('.')[:4]
+            cleaned_sentences = [s.strip() + '.' for s in summary_sentences if s.strip()]
+            responses = []
+            
+            if cleaned_sentences:
+                base_sentence = cleaned_sentences[0]
+                additional_info = ' '.join(cleaned_sentences[1:]) if len(cleaned_sentences) > 1 else ''
+                
+                responses = [
+                    f"Let me explain {page.title}! {base_sentence}",
+                    f"{page.title} is fascinating: {base_sentence} {additional_info}",
+                    f"Here's what I know about {page.title}: {base_sentence}",
+                    f"The concept of {page.title} involves {base_sentence}",
+                    f"In simple terms, {page.title} {base_sentence.lower()}",
+                    f"To understand {page.title}, it's important to know that {base_sentence}",
+                    f"{base_sentence} This is a key aspect of {page.title}.",
+                    f"When discussing {page.title}, we should note that {base_sentence}"
+                ]
+            
+            if not responses:
+                return None
+                
+            return {
+                "title": page.title.lower().replace(" ", "_"),
+                "questions": questions,
+                "responses": responses
+            }
+        except Exception as e:
+            print(f"Error getting Wikipedia content: {str(e)}")
+            return None
+
+    def train(self, duration_minutes=10):
+        print(f"[neural.process] training: {duration_minutes} minutes...")
+        end_time = time.time() + (duration_minutes * 60)
+        articles_processed = 0
+        failed_attempts = 0
+        
+        while time.time() < end_time:
+            try:
+                content = self.get_random_wikipedia_content()
+                if content:
+                    category_name = f"topic_{content['title']}"
+                    self.knowledge_base[category_name] = {
+                        "questions": content['questions'],
+                        "responses": content['responses']
+                    }
+                    articles_processed += 1
+                    print(f"[{datetime.now().strftime('%H:%M:%S')}] Added knowledge about: {content['title']}")
+                    
+                    # Save
+                    if articles_processed % 4 == 0:  # Save more frequently
+                        self.save_knowledge_base()
+                        print(f"[neural_process] saved: {articles_processed} articles.")
+                else:
+                    failed_attempts += 1
+                    if failed_attempts % 5 == 0:
+                        print(f"Had {failed_attempts} failed attempts, continuing...")
+                        
+                time.sleep(1)  # Prevent rapid
+                
+            except Exception as e:
+                print(f"Error during training: {str(e)}")
+                failed_attempts += 1
+                time.sleep(2)
+                continue
+                
+        # Final save
+        self.save_knowledge_base()
+        print(f"[neural_process] loaded {articles_processed} articles successfully")
+        print(f"Failed attempts: {failed_attempts}")
+        return articles_processed
+
+def main():
+    trainer = KnowledgeBaseTrainer()
+    trainer.train(60) # 1 hour training
+    
+if __name__ == "__main__":
+    main()
+
