@@ -1,0 +1,476 @@
+getgenv().Query = { -- // scripted by uuu
+    ["Options"] = {
+        Loader = true,
+        LoaderType = "Notifications" -- // "Notifications","Image"
+    },
+    ["Aimbot"] = {
+        Enabled = true,
+        AimbotKeybind = "C",
+        Hitbox = "HumanoidRootPart",
+        Distance = 1000,
+        HitAirshots = false,
+        HitAirshotsHitbox = "LowerTorso",
+        Prediction = 0.17,
+        Smoothing = true,
+        Smoothness = 0.00573,
+        Shaking = true,
+        SX = 0, -- // Shake X 
+        SY = 0, -- // Shake Y
+        SZ = 0, -- // Shake Z
+        HitboxAimType = "Closest", -- // "Default" or "Point" or"Closest" (Dont Use Closest Its Bad Rn ANd Fps Drops)
+        ["Easing"] = {
+            Style = "Linear", -- // "Linear" or "Quint" or "Back" or "Sine" or "Elastic" or "Circular"
+            Direction = "InOut" -- // "In" or "Out" or "InOut"
+        },
+    },
+    ["Silent"] = {
+        Enabled = true,
+        Hitboxes = "HumanoidRootPart",
+        HitboxAimType = "Closest", -- // "Default" or "Point" or "Closest" (Dont Use Closest Its Bad Rn ANd Fps Drops)
+        Prediction = 0.12951,
+        EnabledSilentKeybind = true,
+        SilentKeybind = "G",
+        Notifications = true
+    },
+    ["Fov"] = {
+        ["Silent"] = {
+            Visible = false,
+            Filled = false,
+            Size = 15.5,
+            Transparency = 0.50,
+            Thickness = 1,
+            Color = Color3.fromRGB(0, 0, 0),
+            Sides = 20
+        },
+        ["Aimbot"] = {
+            UseFov = false, -- // Has Bugs Dont Recommend
+            Visible = false,
+            Filled = false,
+            Size = 50,
+            Transparency = 0.30,
+            Thickness = 1,
+            Color = Color3.fromRGB(0, 0, 0),
+            Sides = 20
+        },
+        ["Dynamic"] = {
+            Enabled = false, -- // WAIT TILL REVAMP IT WILL BE BETTER
+            Circle = "Silent", -- // sILENT oNLY 
+            Close = 150,
+            Close_Studs = 10,
+            Mid = 60,
+            Mid_Studs = 100,
+            Far = 15,
+            Far_Studs = 1000,
+            VeryFar =  7,
+            VeryFar_Studs = 100000 -- // Or Set Math,huge
+        },
+    },
+    ["TriggerBot"] = {
+        Enabled = false, --// Sometimes The Range Bugs It BUt Meh
+        Delay = false,
+        Delayness = 0.01,
+        EnabledTriggerKey = false,
+        TriggerKeybind = "Y",
+        Notifications = false
+    },
+    ["Checks"] = {
+        Wall = true,
+        Knock = true, -- // didnt add for silent im lazyyyyyyy
+        NoGroundShots = true -- // Depends On Pred But Still Good 
+    },
+    ["Chat"] = {
+        Enabled = true, -- //  No Point Of Adding A Customizable "Commands" Example "." or "!" not wasting my time
+        Circle = "Silent", -- // "Silent" or "Aimbot"
+        CircleSize = ".fov",
+        Prediction = "Silent", -- // "Silent" or "Aimbot"
+        PredictionAmount = ".prediction",    
+    },
+    ["Resolver"] = {
+        Resolver = false, -- // Its in the new version not in this version
+    },
+}
+
+local StarterGui = game:GetService("StarterGui")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Client = LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local GetPlayers = Players.GetPlayers
+local Mouse = LocalPlayer:GetMouse()
+local RunService = game:GetService("RunService")
+local Camera = game.Workspace.CurrentCamera
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TPservice= game:GetService("TeleportService")
+local GetPlayers = Players.GetPlayers
+local Mouse = LocalPlayer:GetMouse()
+local Workspace = game:GetService("Workspace")
+local GuiService = game:GetService("GuiService")
+local CurrentCamera = Workspace.CurrentCamera
+local TeleportService = game:GetService("TeleportService")
+local GetGuiInset = GuiService.GetGuiInset
+local Circle1 = Drawing.new("Circle")
+local Circle2 = Drawing.new("Circle")
+local Plr,Plr2,IsTargetting
+
+function WallCheck (destination, ignore)
+    if (getgenv().Query["Checks"].Wall) then
+        local Origin = Camera.CFrame.p
+        local CheckRay = Ray.new(Origin, destination - Origin)
+        local Hit = game:GetService("Workspace"):FindPartOnRayWithIgnoreList(CheckRay, ignore)
+        return Hit == nil
+    else
+        return true
+    end
+end
+
+local WTS = (function(Object)
+	local ObjectVector = CurrentCamera:WorldToScreenPoint(Object.Position)
+	return Vector2.new(ObjectVector.X, ObjectVector.Y)
+end)
+
+local Filter = (function(obj)
+	if (obj:IsA('BasePart')) then
+		return true
+	end
+end)
+
+local MousePosVector2 = (function()
+	return Vector2.new(Mouse.X, Mouse.Y) 
+end)
+
+if getgenv().Query["Options"].Loader and getgenv().Query["Options"].LoaderType == "Notifications" then
+wait(0.3)
+    StarterGui:SetCore("SendNotification",{
+        Title = "Query.cc",
+        Text = "Loaded"
+    })
+wait(0.5)
+elseif getgenv().Query["Options"].Loader and getgenv().Query["Options"].LoaderType == "Image" then
+wait(0.3)
+        --
+wait(0.5)
+end
+
+function AimbotFOV()
+    if not (Circle1) then
+        return
+    end
+    Circle1.Visible = getgenv().Query["Fov"]["Aimbot"].Visible
+    Circle1.Radius =  getgenv().Query["Fov"]["Aimbot"].Size * 2.1
+    Circle1.Position = Vector2.new(Mouse.X, Mouse.Y + GetGuiInset(GuiService).Y)
+    Circle1.Filled = getgenv().Query["Fov"]["Aimbot"].Filled
+    Circle1.Transparency = getgenv().Query["Fov"]["Aimbot"].Transparency
+    Circle1.Thickness = getgenv().Query["Fov"]["Aimbot"].Thickness
+    Circle1.NumSides = getgenv().Query["Fov"]["Aimbot"].Sides
+    Circle1.Color = getgenv().Query["Fov"]["Aimbot"].Color
+    return Circle1
+end
+
+function SilentFOV()
+  if not (Circle2) then
+      return
+  end
+  Circle2.Visible = getgenv().Query["Fov"]["Silent"].Visible
+  Circle2.Radius =  getgenv().Query["Fov"]["Silent"].Size * 2.1
+  Circle2.Position = Vector2.new(Mouse.X, Mouse.Y + GetGuiInset(GuiService).Y)
+  Circle2.Filled = getgenv().Query["Fov"]["Silent"].Filled
+  Circle2.Transparency = getgenv().Query["Fov"]["Silent"].Transparency
+  Circle2.Thickness = getgenv().Query["Fov"]["Silent"].Thickness
+  Circle2.NumSides = getgenv().Query["Fov"]["Silent"].Sides
+  Circle2.Color = getgenv().Query["Fov"]["Silent"].Color
+  return Circle2
+end
+RunService.Heartbeat:Connect(function() AimbotFOV() SilentFOV()end)
+
+
+if getgenv().Query["Fov"]["Aimbot"].UseFov == true then
+    function NearestPerson()
+        local closestPlayer
+        local shortestDistance = getgenv().Query["Fov"]["Aimbot"].Size
+        for i, v in ipairs(game.Players:GetPlayers()) do
+            pcall(function()
+                if v ~= game.Players.LocalPlayer and v.Character and
+                    v.Character:FindFirstChild("Humanoid") and WallCheck(v.Character.HumanoidRootPart.Position, {Client, v.Character})  then
+                    local pos = CurrentCamera:WorldToViewportPoint(v.Character.PrimaryPart.Position)
+                    local magnitude =
+                    (Vector2.new(pos.X, pos.Y) - Vector2.new(Mouse.X, Mouse.Y)).magnitude
+                    if (Vector2.new(pos.X, pos.Y) - Vector2.new(Mouse.X, Mouse.Y)).magnitude < shortestDistance then
+                        closestPlayer = v
+                        shortestDistance = magnitude
+                    end
+                end
+            end)
+        end
+    return closestPlayer
+  end
+    elseif getgenv().Query["Fov"]["Aimbot"].UseFov == false then
+        function NearestPerson()
+            local closestPlayer
+            local shortestDistance = getgenv().Query["Aimbot"].Distance
+            for i, v in ipairs(game.Players:GetPlayers()) do
+                pcall(function()
+                    if v ~= game.Players.LocalPlayer and v.Character and
+                        v.Character:FindFirstChild("Humanoid") and WallCheck(v.Character.HumanoidRootPart.Position, {Client, v.Character}) then
+                        local pos = CurrentCamera:WorldToViewportPoint(v.Character.PrimaryPart.Position)
+                        local magnitude =
+                        (Vector2.new(pos.X, pos.Y) - Vector2.new(Mouse.X, Mouse.Y)).magnitude
+                        if (Vector2.new(pos.X, pos.Y) - Vector2.new(Mouse.X, Mouse.Y)).magnitude < shortestDistance then
+                            closestPlayer = v
+                            shortestDistance = magnitude
+                        end
+                    end
+                end)
+            end
+        return closestPlayer
+    end
+end
+
+local ClosestPlrFromMouse = function()
+    local Target = nil
+    Closest = 1 / 0
+    for _ ,v in ipairs(Players:GetPlayers()) do
+        if (v.Character and v ~= Client and v.Character:FindFirstChild("HumanoidRootPart")) and WallCheck(v.Character.HumanoidRootPart.Position, {Client, v.Character})  then
+            local Position, OnScreen = Camera:WorldToScreenPoint(v.Character.HumanoidRootPart.Position)
+            local Distance = (Vector2.new(Position.X, Position.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
+            if (Circle2.Radius > Distance and Distance < Closest and OnScreen and Position) then
+                Closest = Distance
+                Target = v
+            end
+        end
+    end
+    return Target
+end
+
+local GetClosestBodyPart = (function()
+	local ShortestDistance = math.huge
+	local BodyPart = nil
+	for _, v in next, game.Players:GetPlayers() do
+		if (v ~= Client and v.Character and v.Character:FindFirstChild("Humanoid")) then
+			for k, x in next, v.Character:GetChildren() do
+				if (Filter(x)) then
+					local Distance = (WTS(x) - MousePosVector2()).magnitude
+					if (Distance < ShortestDistance) then
+						ShortestDistance = Distance
+						BodyPart = x
+					end
+				end
+			end
+		end
+	end
+	return BodyPart
+end)
+
+task.spawn(function ()
+    while task.wait() do
+            if Plr then
+                if getgenv().Query["Aimbot"].Enabled == true and getgenv().Query["Aimbot"].HitboxAimType == "Closest" then
+                    getgenv().Query["Aimbot"].Hitbox = tostring(GetClosestBodyPart(Plr.Character))
+                elseif getgenv().Query["Aimbot"].Enabled == true and getgenv().Query["Aimbot"].HitboxAimType == "Default" then
+                    getgenv().Query["Aimbot"].Hitbox = getgenv().Query["Aimbot"].Hitbox
+                elseif getgenv().Query["Aimbot"].Enabled == true and getgenv().Query["Aimbot"].HitboxAimType == "Point" then
+                    getgenv().Query["Aimbot"].Hitbox = tostring(ClosestPoint(Plr.Character))
+                end
+                if Plr2 then
+                    if getgenv().Query["Silent"].Enabled == true and getgenv().Query["Silent"].HitboxAimType == "Closest" then
+                        getgenv().Query["Silent"].Hitboxes = tostring(GetClosestBodyPart(Plr2.Character))
+                    elseif getgenv().Query["Silent"].Enabled == true and getgenv().Query["Silent"].HitboxAimType == "Default" then
+                        getgenv().Query["Silent"].Hitboxes = getgenv().Query["Silent"].Hitboxes
+                    elseif getgenv().Query["Silent"].Enabled == true and getgenv().Query["Silent"].HitboxAimType == "Point" then
+                        getgenv().Query["Silent"].Hitboxes = tostring(ClosestPoint(Plr2.Character))
+                    end
+               end
+           end
+      end
+end)
+
+if getgenv().Query["Aimbot"].HitAirshots == true then
+    if Plr.Character.Humanoid.Jump == true and Plr.Character.Humanoid.FloorMaterial == Enum.Material.Air then
+        getgenv().Query["Aimbot"].Hitbox = getgenv().Query["Aimbot"].HitAirshotsHitbox
+    else
+        Plr.Character:WaitForChild("Humanoid").StateChanged:Connect(function(old,new)
+            if new == Enum.HumanoidStateType.Freefall then
+                getgenv().Query["Aimbot"].Hitbox = getgenv().Query["Aimbot"].HitAirshotsHitbox
+            else
+                getgenv().Query["Aimbot"].Hitbox = getgenv().Query["Aimbot"].Hitbox
+            end
+        end)
+    end
+end
+
+Mouse.KeyDown:Connect(function(Key)
+    local Keybind = getgenv().Query["Aimbot"].AimbotKeybind:lower()
+    if (Key == Keybind) then
+        if getgenv().Query["Aimbot"].Enabled == true then
+            IsTargetting = not IsTargetting
+            if IsTargetting then
+            Plr = NearestPerson()
+            else
+                if Plr ~= nil then
+                    Plr = nil
+                end
+            end
+       end
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if getgenv().Query["Aimbot"].Enabled == true and Plr and Plr.Character ~= nil then
+        if getgenv().Query["Aimbot"].Shaking then
+            local Main = CFrame.new(Camera.CFrame.p,Plr.Character[getgenv().Query["Aimbot"].Hitbox].Position + Plr.Character[getgenv().Query["Aimbot"].Hitbox].Velocity*getgenv().Query["Aimbot"].Prediction +
+            Vector3.new(
+                math.random(-getgenv().Query["Aimbot"].SX,getgenv().Query["Aimbot"].SX),
+                math.random(-getgenv().Query["Aimbot"].SY,getgenv().Query["Aimbot"].SZ),
+                math.random(-getgenv().Query["Aimbot"].SZ,getgenv().Query["Aimbot"].SZ)
+            )*1)
+            Camera.CFrame = Camera.CFrame:Lerp(Main,getgenv().Query["Aimbot"].Smoothness,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut,Enum.EasingStyle.Bounce,Enum.EasingDirection.Out,Enum.EasingStyle.Exponential,Enum.EasingDirection.Out)
+        else
+            local Main = CFrame.new(Camera.CFrame.p,Plr.Character[getgenv().Query["Aimbot"].Hitbox].Position + Plr.Character[getgenv().Query["Aimbot"].Hitbox].Velocity*getgenv().Query["Aimbot"].Prediction)
+            Camera.CFrame = Camera.CFrame:Lerp(Main,getgenv().Query["Aimbot"].Smoothness,Enum.EasingStyle[getgenv().Query["Aimbot"]["Easing"].Style],Enum.EasingDirection[getgenv().Query["Aimbot"]["Easing"].Direction])
+        end
+    end
+end)
+
+RunService.Heartbeat:Connect(function()
+                if getgenv().Query["Aimbot"].Enabled == true and Plr and Plr.Character ~= nil then
+        if getgenv().Query["Checks"].Knock then
+            if Plr.Character.BodyEffects["K.O"].Value then Plr = nil 
+            end
+        end
+        end
+end)
+
+RunService.Heartbeat:Connect(function()
+    if getgenv().Query["Fov"]["Dynamic"].Enabled and getgenv().Query["Fov"]["Dynamic"].Circle == "Silent" and Client ~= nil and
+        (Client.Character) and Plr2 and Plr2.Character then
+        if (Client.Character.HumanoidRootPart.Position - Plr2.Character.HumanoidRootPart.Position).Magnitude <
+        getgenv().Query["Fov"]["Dynamic"].Close_Studs then
+            getgenv().Query["Fov"]["Silent"].Size = getgenv().Query["Fov"]["Dynamic"].Close
+        elseif (Client.Character.HumanoidRootPart.Position - Plr2.Character.HumanoidRootPart.Position).Magnitude <
+        getgenv().Query["Fov"]["Dynamic"].Mid_Studs then
+            getgenv().Query["Fov"]["Silent"].Size = getgenv().Query["Fov"]["Dynamic"].Mid
+        elseif (Client.Character.HumanoidRootPart.Position - Plr2.Character.HumanoidRootPart.Position).Magnitude <
+        getgenv().Query["Fov"]["Dynamic"].Far_Studs then
+            getgenv().Query["Fov"]["Silent"].Size = getgenv().Query["Fov"]["Dynamic"].Far
+        elseif (Client.Character.HumanoidRootPart.Position - Plr2.Character.HumanoidRootPart.Position).Magnitude <
+        getgenv().Query["Fov"]["Dynamic"].VeryFar_Studs then
+            getgenv().Query["Fov"]["Silent"].Size = getgenv().Query["Fov"]["Dynamic"].VeryFar
+        end
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if getgenv().Query["Aimbot"].Smoothing and getgenv().Query["Aimbot"].Enabled  == true then
+        local Main = CFrame.new(workspace.CurrentCamera.CFrame.p, Plr.Character[getgenv().Query["Aimbot"].Hitbox].Position + Plr.Character[getgenv().Query["Aimbot"].Hitbox].Velocity*getgenv().Query["Aimbot"].Prediction)
+                                     workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame:Lerp(Main,getgenv().Query["Aimbot"].Smoothness,Enum.EasingStyle[getgenv().Query["Aimbot"]["Easing"].Style],Enum.EasingDirection[getgenv().Query["Aimbot"]["Easing"].Direction])
+    elseif getgenv().Query["Aimbot"].Smoothing == false and  getgenv().Query["Aimbot"].Enabled == true then
+        workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, Plr.Character[getgenv().Query["Aimbot"].Hitbox].Position + Plr.Character[getgenv().Query["Aimbot"].Hitbox].Velocity*getgenv().Query["Aimbot"].Prediction)
+                                end
+end)
+
+local grmt = getrawmetatable(game)
+local backupindex = grmt.__index
+setreadonly(grmt, false)
+
+grmt.__index = newcclosure(function(self, v)
+if (getgenv().Query["Silent"].Enabled and Mouse and tostring(v) == "Hit") then
+    Plr2 = ClosestPlrFromMouse()
+    if Plr2 then
+        local endpoint = game.Players[tostring(Plr2)].Character[getgenv().Query["Silent"]["Hitboxes"]].CFrame + (
+            game.Players[tostring(Plr2)].Character[getgenv().Query["Silent"]["Hitboxes"]].Velocity *getgenv().Query["Silent"].Prediction
+        )
+        return (tostring(v) == "Hit" and endpoint)
+    end
+end
+return backupindex(self, v)
+end)
+
+RunService.RenderStepped:Connect(function()
+    if getgenv().Query["TriggerBot"].Enabled then
+        if Mouse.Target then
+            if Mouse.Target.Parent:FindFirstChild('Humanoid') and Mouse.Target.Parent:FindFirstChild('Head') and Mouse.Target.Parent:FindFirstChild('LowerTorso') and Mouse.Target.Parent:FindFirstChild('UpperTorso') then
+                if getgenv().Query["TriggerBot"].Delay then
+                    wait(getgenv().Query["TriggerBot"].Delayness)
+                    mouse1click()
+                    mouse1release()
+                else
+                    mouse1click()
+                    mouse1release()
+                end
+            end
+        end
+    end
+end)
+
+Mouse.KeyDown:Connect(
+  function(Key)
+    if getgenv().Query["TriggerBot"].EnabledTriggerKey then
+    if (Key ==  getgenv().Query["TriggerBot"].TriggerKeybind:lower()) then
+        if  getgenv().Query["TriggerBot"].Enabled == true then
+            getgenv().Query["TriggerBot"].Enabled = false
+            StarterGui:SetCore("SendNotification",{
+                Title = "Query.cc",
+                Text = "TB Disabled"
+            })
+        else
+            getgenv().Query["TriggerBot"].Enabled = true
+            StarterGui:SetCore("SendNotification",{
+                Title = "Query.cc",
+                Text = "TB Enabled"
+            })
+        end
+    end
+  end
+end
+)
+
+task.spawn(function()
+    if getgenv().Query["Checks"].NoGroundShots and Plr2.Character[getgenv().Query["Silent"].Hitboxes].Velocity.Y < -15 then
+        pcall(function()
+            local Target = Plr2.Character[getgenv().Query["Silent"].Hitboxes]
+            Target.Velocity = Vector3.new(Target.Velocity.X, (Target.Velocity.Y / 5), Target.Velocity.Z)
+            Target.AssemblyLinearVelocity = Vector3.new(Target.Velocity.X, (Target.Velocity.Y / 5), Target.Velocity.Z)
+        end)
+    end
+end)
+
+Client.Chatted:Connect(function(message)
+    if getgenv().Query["Chat"].Enabled then
+        local args = string.split(message, " ")
+        if args[1] == getgenv().Query["Chat"].CircleSize and getgenv().Query["Chat"].Circle == "Silent" and args[2] ~= nil then
+            getgenv().Query["Fov"]["Silent"].Size = tonumber(args[2])
+        elseif args[1] == getgenv().Query["Chat"].CircleSize and getgenv().Query["Chat"].Circle == "Aimbot" and args[2] ~= nil then
+            getgenv().Query["Fov"]["Aimbot"].Size = tonumber(args[2])
+        end
+    end
+    if getgenv().Query["Chat"].Enabled then
+        local args = string.split(message, " ")
+        if args[1] == getgenv().Query["Chat"].PredictionAmount and getgenv().Query["Chat"].Prediction == "Silent" and args[2] ~= nil then
+            getgenv().Query["Silent"].Prediction = tonumber(args[2])
+        elseif args[1] == getgenv().Query["Chat"].PredictionAmount and getgenv().Query["Chat"].Prediction == "Aimbot" and args[2] ~= nil then
+            getgenv().Query["Aimbot"].Prediction = tonumber(args[2])
+        end
+    end
+end)
+
+Mouse.KeyDown:Connect(
+  function(Key)
+    if getgenv().Query["Silent"].EnabledSilentKeybind then
+    if (Key ==  getgenv().Query["Silent"].SilentKeybind:lower()) then
+        if getgenv().Query["Silent"].Enabled == true then
+            getgenv().Query["Silent"].Enabled = false
+            StarterGui:SetCore("SendNotification",{
+                Title = "Query.cc",
+                Text = "SA Disabled"
+            })
+        else
+            getgenv().Query["Silent"].Enabled = true
+            StarterGui:SetCore("SendNotification",{
+                Title = "Query.cc",
+                Text = "SA Enabled"
+            })
+        end
+    end
+  end
+end
+)
