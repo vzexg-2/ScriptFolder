@@ -1,0 +1,11 @@
+getgenv()['VastHook'] = {
+    ['HitboxExpander'] = {
+        ['Keybind'] = Enum.KeyCode.E,
+        ['Size'] = Vector3.new(25, 25, 25),
+    },
+    ['Visual'] = {
+        ['Box'] = {
+            ['Color'] = Color3.fromRGB(128, 0, 128),
+            ['Transparency'] = 0.7,
+        },
+    }
