@@ -1,0 +1,1 @@
+{"OpenButtonFloating":true,"EnabledNotifications":true,"Wallpaper":"11926598891","UIScale":"1.05","ButtonTopLeft":true,"WhiteBackground":true,"AnimationDelay":0.6}
